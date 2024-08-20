@@ -1,0 +1,8 @@
+[Unit]
+Description=Fire animation for led strips on vibration
+
+[Service]
+ExecStart=/bin/bash /home/sven/rpi-ws281x-fire/autoUpdateAndStart.sh
+
+[Install]
+WantedBy=multi-user.target

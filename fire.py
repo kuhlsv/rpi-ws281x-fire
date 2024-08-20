@@ -14,6 +14,9 @@ LED_BRIGHTNESS = 200  # Set to 0 for darkest and 255 for brightest
 LED_INVERT = False    # True to invert the signal (when using NPN transistor level shift)
 LED_CHANNEL = 0       # set to '1' for GPIOs 13, 19, 41, 45 or 53
 SENSOR_PIN = 23       # Sensor pin for KY-002
+DEBOUNCE_TIME = 300
+FLAME_DURATION = 1.2
+FLAME_CHANCE = 0.95
 
 # Fire simulation classes
 class Fireplace:
@@ -117,9 +120,9 @@ class Fireflame:
         """Show a big flame effect for a short duration."""
         self.draw(self.big_fire_flame)  # Draw big flame
         time.sleep(duration)        # Hold the flame for the specified duration
-        self.clear()                # Clear the flame
+        #self.clear()                # Clear the flame
+        self.draw()		# Reset the flame
         self.strip.show()
-        #self.draw()
 
 def debounce(sensor_pin, debounce_time_ms=50):
     """
@@ -155,9 +158,8 @@ def debounce(sensor_pin, debounce_time_ms=50):
 
 def flame_up(fire):
     # Occasionally trigger a big flame effect
-    if random.random() < 0.95:  # 95% chance to trigger big flame
-        fire.big_flame(duration=0.9)  # Adjust duration as needed
-        time.sleep(random.uniform(0.05, 0.20))
+    if random.random() < FLAME_CHANCE:  # 95% chance to trigger big flame
+        fire.big_flame(duration=FLAME_DURATION)  # Adjust duration as needed
 
 def shake_wrapper(fire):
     # Wrappes the callback function for custom a parameter
@@ -179,8 +181,8 @@ def shake(channel):
 strip = PixelStrip(LED_COUNT, LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS, LED_CHANNEL)
 strip.begin()
 fire = Fireflame(strip)
+time.sleep(random.uniform(1, 3))
 fire.draw()
-time.sleep(random.uniform(0.05, 0.20))
 
 # Main
 if __name__ == '__main__':
@@ -192,11 +194,11 @@ if __name__ == '__main__':
     # Init vibration Sensor with KY-002
     GPIO.setmode(GPIO.BCM)
     GPIO.setup(SENSOR_PIN, GPIO.IN, pull_up_down = GPIO.PUD_UP)
-    GPIO.add_event_detect(SENSOR_PIN, GPIO.FALLING, callback=shake, bouncetime=100) 
+    GPIO.add_event_detect(SENSOR_PIN, GPIO.FALLING, callback=shake, bouncetime=DEBOUNCE_TIME)
 
     try:
         while True:
-            time.sleep(1)
+            time.sleep(random.uniform(1.2, 1.8))
             fire.draw()
     except KeyboardInterrupt:
          print("Program terminated!")
