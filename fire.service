@@ -1,5 +1,7 @@
 [Unit]
 Description=Fire animation for led strips on vibration
+Wants=network-online.target
+After=network-online.target
 
 [Service]
 ExecStart=/bin/bash /home/sven/rpi-ws281x-fire/autoUpdateAndStart.sh
